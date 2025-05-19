@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My First Website 2025 - Slides Cập Nhật</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior: none;
+            /* Prevent text selection during rapid clicks or drags */
+            user-select: none;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+ */
+        }
+
+        .slide {
+            display: none;
+            min-height: calc(100vh - 120px); /* Account for timer and nav buttons */
+            height: 100%;
+            width: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+            padding-top: 20px; /* Space from top for timer */
+            padding-bottom: 20px; /* Space from bottom for nav buttons */
+        }
+
+        .slide.active {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .nav-button {
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .nav-button:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .nav-button:disabled {
+            background-color: #9ca3af; /* Tailwind gray-400 */
+            cursor: not-allowed;
+            transform: translateY(0px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+
+        .bar { fill: #4f46e5; /* Indigo-600 */ transition: fill 0.3s ease; }
+        .bar:hover { fill: #fb923c; /* Orange-400 */ }
+        .axis-label { font-size: 0.85rem; font-weight: 500; }
+        .chart-title { font-size: 1.5rem; font-weight: 700; text-anchor: middle; fill: #374151; /* Gray-700 */ }
+        
+        .slide-content-wrapper {
+            max-width: 950px; /* Increased max-width */
+            width: 90%;
+            padding: 25px 30px; /* Increased padding */
+            background-color: rgba(255, 255, 255, 0.95); /* Slightly more opaque */
+            border-radius: 16px; /* More rounded */
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12); /* Softer shadow */
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll, slides handle their own if needed */
+        }
+        #slides-presentation-container { /* Renamed for clarity */
+            height: 100vh;
+            overflow: hidden; /* Main container hides overflow */
+            position: relative;
+            background-color: #f3f4f6; /* Light gray background for the whole page */
+        }
+
+        #countdown-timer {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background-color: rgba(31, 41, 55, 0.85); /* Gray-800 with opacity */
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 2em; /* Larger font */
+            font-weight: 700; /* Bolder */
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+        }
+
+        .scrollable-content {
+            max-height: calc(100vh - 280px); /* Adjust based on title and padding */
+            overflow-y: auto;
+            padding-right: 15px; /* For scrollbar */
+            scrollbar-width: thin;
+            scrollbar-color: #a5b4fc #e0e7ff; /* Indigo-300 and Indigo-100 */
+        }
+        .scrollable-content::-webkit-scrollbar { width: 8px; }
+        .scrollable-content::-webkit-scrollbar-track { background: #e0e7ff; border-radius: 4px;}
+        .scrollable-content::-webkit-scrollbar-thumb { background-color: #a5b4fc; border-radius: 4px; border: 2px solid #e0e7ff; }
+
+        .timeline-item { position: relative; padding-left: 35px; margin-bottom: 20px; border-left: 3px solid #a5b4fc; }
+        .timeline-item:last-child { border-left: none; padding-bottom: 0; margin-bottom: 0; }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -11px; top: 0px; width: 20px; height: 20px;
+            border-radius: 50%; background-color: #6366f1; /* Indigo-500 */ border: 3px solid white;
+            box-shadow: 0 0 0 3px #a5b4fc; /* Outer ring */
+        }
+        .slide-title { font-size: 2.5rem; font-weight: 800; color: #4338ca; /* Indigo-700 */ margin-bottom: 1.5rem; text-align: center; }
+        .slide-subtitle { font-size: 1.5rem; font-weight: 600; color: #ea580c; /* Orange-600 */ margin-bottom: 1rem; }
+        .slide-text { font-size: 1.15rem; line-height: 1.8; color: #374151; /* Gray-700 */ }
+        .slide-list { list-style-position: outside; padding-left: 1.5rem; }
+        .slide-list li { margin-bottom: 0.75rem; }
+        .highlight { color: #dd6b20; font-weight: 600; } /* Orange-600 for highlights */
+    </style>
+</head>
+
+<body class="flex flex-col items-center justify-center min-h-screen p-0 m-0">
+
+    <div id="slides-presentation-container" class="w-full">
+        <div id="countdown-timer">05:00</div>
+
+        <div id="slides-container" class="w-full h-full overflow-hidden">
+            <div id="slide1" class="slide active p-6 md:p-10 text-center">
+                <div class="slide-content-wrapper">
+                    <img src="logohutech.png" alt="[Biểu trưng HUTECH]" class="mx-auto mb-8 rounded-full shadow-xl w-32 h-32 md:w-40 md:h-40">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-indigo-700 mb-5">MY FIRST WEBSITE 2025</h1>
+                    <p class="text-2xl md:text-4xl text-orange-600 font-bold mb-8">CHỦ ĐỀ: <span class="highlight"></span>"TRƯỜNG SẠCH"</span></p>
+                    <p class="text-md md:text-lg text-gray-600 font-medium">
+                        Đơn vị tổ chức: <span class="font-semibold">Khoa CNTT HUTECH, AZDIGI, MB Bank, Doanh nghiệp xã hội Con Voi</span>
+                    </p>
+                </div>
+            </div>
+
+            <div id="slide2" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">GIỚI THIỆU CUỘC THI</h2>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li>Khuyến khích phong trào học tập, nghiên cứu khoa học.</li>
+                            <li>Sân chơi học tập lành mạnh, bổ ích, giao lưu sinh viên.</li>
+                            <li>Phát hiện, bồi dưỡng sinh viên tiềm năng cho các cuộc thi học thuật, NCKH.</li>
+                            <li>Tiếp nối thành công các mùa trước, Khoa CNTT phối hợp cùng AZDIGI, MB Bank, DNXH Con Voi tổ chức.</li>
+                            <li>Chủ đề <span class="highlight">"TRƯỜNG SẠCH"</span>: Xây dựng website ứng dụng cao, giải quyết vấn đề vệ sinh học đường, nâng cao môi trường giáo dục.</li>
+                            <li>Tham khảo thêm: <a href="https://convoi.com.vn" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline font-semibold">convoi.com.vn</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide3" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">YÊU CẦU</h2>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li><span class="font-semibold">Tổ chức:</span> Nghiêm túc, công bằng, chuyên nghiệp, tiết kiệm.</li>
+                            <li><span class="font-semibold">Tuyên dương & Khen thưởng:</span> Hiệu quả sâu rộng.</li>
+                            <li><span class="font-semibold">Nội dung & Hình thức:</span> Phù hợp, sát đào tạo, ứng dụng thực tiễn, sáng tạo cao, thu hút sinh viên.</li>
+                            <li><span class="font-semibold">Bồi dưỡng:</span> Huấn luyện thí sinh tham gia hội thi cấp Thành phố, Quốc gia; cung cấp nguồn nhân lực CNTT chất lượng.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide4" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">ĐỐI TƯỢNG DỰ THI</h2>
+                    <div class="scrollable-content slide-text">
+                        <p class="mb-4">Sinh viên HUTECH các ngành/đơn vị:</p>
+                        <ul class="list-disc slide-list">
+                            <li><span class="font-semibold">Khoa CNTT:</span> CNTT, ATTT, KHDL, KHMT (nay là KTPM), TTNT.</li>
+                            <li><span class="font-semibold">Viện Đào tạo Quốc tế:</span> Ngành CNTT.</li>
+                            <li><span class="font-semibold">Viện Công nghệ Việt Nhật:</span> Ngành CNTT.</li>
+                            <li><span class="font-semibold">Viện Công nghệ Việt Hàn:</span> Ngành CNTT.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide5" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">HÌNH THỨC THAM GIA (P1)</h2>
+                    <div class="scrollable-content slide-text">
+                        <h3 class="slide-subtitle">Đăng ký dự thi:</h3>
+                        <ul class="list-disc slide-list mb-6">
+                            <li><span class="font-semibold">Phát động:</span> Thứ 2, <span class="highlight">05/05/2025</span>.</li>
+                            <li><span class="font-semibold">Hạn đăng ký:</span> Đến hết Thứ 5, <span class="highlight">22/05/2025</span>.</li>
+                            <li><span class="font-semibold">Cách thức:</span> Theo link BTC cung cấp.</li>
+                        </ul>
+                        <h3 class="slide-subtitle">Hình thức dự thi:</h3>
+                        <ul class="list-disc slide-list">
+                            <li>Mỗi đội: <span class="highlight">02 sinh viên</span> (mỗi SV chỉ tham gia 1 đội).</li>
+                            <li>Thực hiện website trên nền tảng mã nguồn mở (WordPress, Drupal, OpenCart, Magento,...).</li>
+                            <li>BTC cung cấp hosting Linux (CPanel, MySQL, PHP).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide6" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">HÌNH THỨC THAM GIA (P2)</h2>
+                    <div class="scrollable-content slide-text">
+                         <ul class="list-disc slide-list">
+                            <li>Các đội được tập huấn sử dụng hệ thống nguồn mở.</li>
+                            <li>Tại buổi thi: Thực hiện website theo yêu cầu BTC, cấu hình và vận hành trên hosting do BTC cung cấp.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="slide7" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">LỊCH TRÌNH (P1)</h2>
+                    <h3 class="slide-subtitle text-center mb-6">Tập huấn thí sinh (Online)</h3>
+                    <div class="scrollable-content">
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Buổi 1:</span> 19h00 – 21h30, Thứ 7, <span class="highlight">24/05/2025</span>.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Buổi 2:</span> 19h00 – 21h30, Thứ 4, <span class="highlight">28/05/2025</span>.</p>
+                           
+                        </div>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Buổi 3:</span> 19h00 – 21h30, Thứ 7, <span class="highlight">31/05/2025</span>.</p>
+                             
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide8" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">LỊCH TRÌNH (P2)</h2>
+                    <div class="scrollable-content">
+                        <h3 class="slide-subtitle mb-4">Vòng Sơ Loại (Online)</h3>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Thời gian thi:</span> 19h00 – 21h30, Thứ 3, <span class="highlight">10/06/2025</span>.</p>
+                        </div>
+                        <div class="timeline-item mb-8">
+                            <p class="slide-text"><span class="font-semibold">Công bố kết quả:</span> Ngày <span class="highlight">11/06/2025</span>.</p>
+                        </div>
+
+                        <h3 class="slide-subtitle mb-4">Lễ Khai Mạc, Thi Chung Kết & Trao Giải (Offline)</h3>
+                        <p class="slide-text mb-3"><span class="font-semibold">Địa điểm:</span> Phòng hội nghị E1-02.10, Thu Duc Campus.</p>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Lễ Khai Mạc:</span> 07h30 – 08h00, Thứ 6, <span class="highlight">13/06/2025</span>.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Tổ chức thi (Thuyết trình):</span> 08h00 – 11h30, Thứ 6, <span class="highlight">13/06/2025</span>.</p>
+                        </div>
+                        <div class="timeline-item">
+                            <p class="slide-text"><span class="font-semibold">Lễ Trao Giải:</span> 13h30, Thứ 6, <span class="highlight">13/06/2025</span>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide9" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">CÔNG TÁC CHUẨN BỊ</h2>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li>Các đội <span class="font-semibold">hoàn toàn chịu trách nhiệm</span> chuẩn bị: Thiết bị, thiết lập công cụ và môi trường lập trình.</li>
+                            <li>Được quyền sử dụng lại các thư viện, module hỗ trợ.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide10" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">THI ĐẤU CHUNG KẾT</h2>
+                    <div class="scrollable-content slide-text">
+                        <p class="mb-3"><span class="font-semibold">Thuyết trình & Vấn đáp trước BGK:</span></p>
+                        <ul class="list-disc slide-list mb-4">
+                            <li><span class="font-semibold">Thời gian:</span> 07h30, Thứ 6, <span class="highlight">13/06/2025</span>.</li>
+                            <li><span class="font-semibold">Mỗi đội:</span> <span class="highlight">10-15 phút</span> trình bày và trả lời.</li>
+                            <li><span class="font-semibold">Địa điểm:</span> Phòng hội nghị E1-02.10, Thu Duc Campus.</li>
+                        </ul>
+                        <p class="mb-3">Được phép sử dụng nội dung đã chuẩn bị (theo Điều 6).</p>
+                        <p class="mb-3">BGK & BTC quyết định giải thưởng.</p>
+                        <p class="text-red-600 font-semibold">Sản phẩm dự thi chưa có giải tại các cuộc thi khác. BTC có quyền hủy kết quả nếu phát hiện sai phạm, giả mạo.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="slide11" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">BAN GIÁM KHẢO</h2>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li>Chuyên gia từ các Doanh nghiệp.</li>
+                            <li>Cán bộ, giảng viên ngành CNTT tại HUTECH, có kinh nghiệm và tâm huyết.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide12" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">TIÊU CHÍ ĐÁNH GIÁ (P1)</h2>
+                    <h3 class="slide-subtitle text-center mb-4">Độ hoàn thiện sản phẩm</h3>
+                     <p class="slide-text text-center mb-4">Thí sinh chọn 1 hoặc nhiều chức năng để xây dựng:</p>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-decimal slide-list">
+                            <li>Cung cấp thông tin về chương trình "Trường Sạch" (mục tiêu, hoạt động, dự án).</li>
+                            <li>Chức năng quyên góp trực tuyến.</li>
+                            <li>Chức năng cửa hàng trực tuyến.</li>
+                            <li>Chức năng liên hệ, phản hồi, đăng ký tham gia chương trình.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide13" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">TIÊU CHÍ ĐÁNH GIÁ (P2)</h2>
+                    <div class="scrollable-content slide-text">
+                        <h3 class="slide-subtitle mb-3">Tính sáng tạo:</h3>
+                        <ul class="list-disc slide-list mb-6">
+                            <li>Công cụ thống kê (Google Analytics, Search Console).</li>
+                            <li>Triển khai lên internet (domain - hosting).</li>
+                            <li>Cài đặt hành động (sự kiện) cho chuyển đổi (gọi điện, đặt hàng, nhắn tin).</li>
+                            <li>Tối ưu SEO (tốc độ, mobile).</li>
+                            <li>Tối ưu UI/UX.</li>
+                        </ul>
+                        <h3 class="slide-subtitle mb-3">Tiêu chí tích hợp AI (<span class="text-red-600">Bắt buộc chọn ít nhất 01</span>):</h3>
+                         <ul class="list-disc slide-list">
+                            <li>Chatbot AI hỗ trợ 24/7 (FAQ, tra cứu, hỗ trợ).</li>
+                            <li>Tạo nội dung SEO tự động (tiêu đề, mô tả, meta tags).</li>
+                            <li>Tối ưu & gắn thẻ hình ảnh thông minh (nén, cắt, alt text tự động).</li>
+                            <li>Tìm kiếm/tra cứu bằng giọng nói.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="slide14" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">TIÊU CHÍ ĐÁNH GIÁ (P3)</h2>
+                     <h3 class="slide-subtitle mb-3">Trình bày:</h3>
+                        <ul class="list-disc slide-list mb-6">
+                            <li>Đội tự tin khi trình bày?</li>
+                            <li>Các thành viên hỗ trợ nhau không?</li>
+                            <li>Nhóm trình bày nội dung đã tìm hiểu và thực hiện.</li>
+                        </ul>
+                    <div id="d3-chart-container" class="w-full h-72 md:h-96 mx-auto bg-gray-50 p-4 rounded-lg shadow-inner">
+                        </div>
+                    <p class="text-center text-sm text-gray-500 mt-3">Biểu đồ minh họa các trọng số tiêu chí (ví dụ).</p>
+                </div>
+            </div>
+
+            <div id="slide15" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">GIẢI THƯỞNG (P1)</h2>
+                    <div class="scrollable-content slide-text">
+                        <h3 class="slide-subtitle">Giải thưởng chính:</h3>
+                        <ul class="list-disc slide-list">
+                            <li><span class="font-semibold">01 Giải Nhất:</span> Hiện kim + Giấy khen cấp trường.</li>
+                            <li><span class="font-semibold">01 Giải Nhì:</span> Hiện kim + Giấy khen cấp trường.</li>
+                            <li><span class="font-semibold">01 Giải Ba:</span> Hiện kim + Giấy khen cấp trường.</li>
+                            <li><span class="font-semibold">05 Giải Khuyến khích:</span> Hiện kim + Giấy khen cấp trường.</li>
+                        </ul>
+                        <p class="mt-3 italic text-sm text-gray-600">(Số lượng và giá trị có thể thay đổi theo tình hình thực tế).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide16" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">GIẢI THƯỞNG (P2)</h2>
+                    <h3 class="slide-subtitle">Quà tặng & Chứng nhận:</h3>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li>Tất cả đội dự thi: 01 hosting (3 tháng).</li>
+                            <li>Quà tặng cho thí sinh có mặt tại Vòng Chung kết.</li>
+                            <li>Tất cả thí sinh đăng ký & tham gia: Giấy chứng nhận + Khóa học "Quản trị thời gian - Quản trị cuộc đời".</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="slide17" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">GIẢI THƯỞNG (P3)</h2>
+                    <h3 class="slide-subtitle">Đặc biệt năm nay:</h3>
+                    <div class="scrollable-content slide-text">
+                        <ul class="list-disc slide-list">
+                            <li>Dự án "Trường Sạch" đoạt giải: Giấy khen của Ban Công tác xã hội - Công đoàn Cục báo chí.</li>
+                            <li>Các đội đoạt giải: Khóa học "12 BƯỚC THẤU SUỐT CHIẾN LƯỢC MARKETING & SALES" từ Coach Lương Ngọc Trung.</li>
+                            <li>Các đội vào chung kết: Phần thưởng từ Ngân hàng Quân Đội (MB Bank).</li>
+                            <li>Đội giới thiệu thành công Trường THPT tham gia "Trường Sạch": Vinh danh trên sân khấu & nền tảng Con Voi.</li>
+                        </ul>
+                         <p class="mt-3 italic text-sm text-gray-600">(Cơ cấu giải có thể thay đổi theo quyết định của BGK).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide18" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">BẢN QUYỀN & SHTT</h2>
+                    <div class="scrollable-content slide-text">
+                        <h3 class="slide-subtitle">Điều 11. Bản quyền sản phẩm:</h3>
+                        <p class="mb-4">Các đội chịu <span class="font-semibold text-red-600">hoàn toàn trách nhiệm</span> về bản quyền sản phẩm, mã nguồn. BTC không chịu trách nhiệm về vi phạm bản quyền.</p>
+                        
+                        <h3 class="slide-subtitle">Điều 12. Bảo hộ Quyền Sở hữu Trí tuệ:</h3>
+                        <p>Sản phẩm có khả năng đăng ký bảo hộ SHTT, BTC sẽ hướng dẫn tác giả đăng ký theo quy định pháp luật.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="slide19" class="slide p-6 md:p-10">
+                <div class="slide-content-wrapper">
+                    <h2 class="slide-title">THI HÀNH & LIÊN HỆ</h2>
+                    <div class="scrollable-content slide-text">
+                        <h3 class="slide-subtitle">Điều 13. Điều khoản thi hành:</h3>
+                        <p class="mb-6">Thể lệ này đã được BTC thông qua và có hiệu lực kể từ ngày ký ban hành.</p>
+                        
+                        <h3 class="slide-subtitle">Thông tin liên hệ BTC:</h3>
+                        <p>Khoa CNTT - Trường Đại học Công nghệ TP.HCM (HUTECH)</p>
+                        <p>Số 475A Điện Biên Phủ, P.25, Q.Bình Thạnh, TP.HCM</p>
+                        <p>Mr. Dương Thành Phết - dt.phet@hutech.edu.vn - 091815860</p>
+                        <p class="mt-4">
+                            Website Khoa CNTT: <a href="https://www.hutech.edu.vn/khoacntt" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline font-semibold">hutech.edu.vn/khoacntt</a><br>
+                            Website Hội thi: <a href="http://ITGotalent.hutech.edu.vn" target="_blank" class="text-indigo-600 hover:text-indigo-800 underline font-semibold">ITGotalent.hutech.edu.vn</a>
+                        </p>
+                         <p class="mt-8 text-center text-xl font-bold text-orange-600">
+                            CHÚC CÁC ĐỘI THI THÀNH CÔNG!
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 pb-5 pt-3 bg-white/80 backdrop-blur-sm shadow-top z-50">
+            <div class="max-w-4xl mx-auto flex justify-center space-x-5 px-4">
+                <button id="prevBtn" class="nav-button bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-opacity-75">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6 inline-block mr-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                    Trước
+                </button>
+                <button id="nextBtn" class="nav-button bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl text-lg shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-opacity-75">
+                    Sau
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-6 h-6 inline-block ml-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Countdown Timer Logic ---
+        const countdownElement = document.getElementById('countdown-timer');
+        let timeInSeconds = 5 * 60; // 5 minutes
+        let timerInterval;
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateTimerDisplay() {
+            countdownElement.textContent = formatTime(timeInSeconds);
+        }
+
+        function startTimer() {
+            updateTimerDisplay(); // Initial display
+            timerInterval = setInterval(() => {
+                timeInSeconds--;
+                updateTimerDisplay();
+                if (timeInSeconds < 0) {
+                    clearInterval(timerInterval);
+                    countdownElement.textContent = "Hết giờ!";
+                    countdownElement.classList.add('bg-red-600'); // Change color when time is up
+                    // Optionally disable navigation
+                    // nextButton.disabled = true;
+                    // prevButton.disabled = true;
+                }
+            }, 1000);
+        }
+        
+        // --- Slide Navigation Logic ---
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const prevButton = document.getElementById('prevBtn');
+        const nextButton = document.getElementById('nextBtn');
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                slide.style.display = 'none'; // Ensure it's hidden
+                 // For accessibility: hide non-active slides from screen readers
+                slide.setAttribute('aria-hidden', 'true');
+            });
+            if (slides[index]) {
+                slides[index].classList.add('active');
+                slides[index].style.display = 'flex'; // Use flex for centering
+                slides[index].setAttribute('aria-hidden', 'false');
+                 // Focus on the new slide for better accessibility, or a specific element within it
+                slides[index].focus(); 
+            }
+            updateNavButtons();
+        }
+
+        function updateNavButtons() {
+            prevButton.disabled = currentSlide === 0;
+            nextButton.disabled = currentSlide === totalSlides - 1;
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentSlide > 0) {
+                currentSlide--;
+                showSlide(currentSlide);
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                showSlide(currentSlide);
+                // D3 chart is on slide 14 (index 13)
+                if (currentSlide === 13) { 
+                    renderD3Chart();
+                }
+            }
+        });
+        
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight' && !nextButton.disabled) {
+                nextButton.click();
+            } else if (event.key === 'ArrowLeft' && !prevButton.disabled) {
+                prevButton.click();
+            }
+        });
+        
+        // --- D3.js Chart Rendering ---
+        let chartRendered = false; 
+        function renderD3Chart() {
+            const d3Container = d3.select("#d3-chart-container");
+            if (!d3Container.node()) {
+                console.error("D3 chart container not found.");
+                return;
+            }
+             // If chart is already rendered and container width hasn't changed significantly, skip re-render
+            const containerNode = d3Container.node();
+            const currentWidth = containerNode.getBoundingClientRect().width;
+            if (chartRendered && Math.abs(d3Container.attr("data-rendered-width") - currentWidth) < 10) {
+                return;
+            }
+
+
+            const data = [
+                { name: "Hoàn Thiện SP", value: 30 }, // Example values
+                { name: "Sáng Tạo", value: 25 },
+                { name: "Tích Hợp AI", value: 20 },
+                { name: "UI/UX", value: 15 },
+                { name: "Trình Bày", value: 10 }
+            ];
+
+            d3Container.selectAll("*").remove(); // Clear previous chart
+            d3Container.attr("data-rendered-width", currentWidth);
+
+
+            const margin = { top: 50, right: 30, bottom: 80, left: 50 };
+            let width = currentWidth - margin.left - margin.right;
+            // Use container's height, ensure it's positive
+            let height = containerNode.getBoundingClientRect().height - margin.top - margin.bottom;
+            
+            if (width <= 0) width = Math.max(200, 500 - margin.left - margin.right); // Default width
+            if (height <= 0) height = Math.max(150, 300 - margin.top - margin.bottom); // Default height
+
+
+            const svg = d3Container.append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+              .append("g")
+                .attr("transform", `translate(${margin.left},${margin.top})`);
+
+            svg.append("text")
+                .attr("class", "chart-title")
+                .attr("x", width / 2)
+                .attr("y", -margin.top / 2 + 10) // Adjusted for larger title
+                .text("Ví dụ Phân Bổ Trọng Số Tiêu Chí");
+
+            const x = d3.scaleBand()
+                .range([0, width])
+                .domain(data.map(d => d.name))
+                .padding(0.4); // More padding
+
+            svg.append("g")
+                .attr("transform", `translate(0,${height})`)
+                .call(d3.axisBottom(x))
+              .selectAll("text")
+                .attr("class", "axis-label")
+                .attr("transform", "translate(-10,10)rotate(-35)") 
+                .style("text-anchor", "end");
+
+            const y = d3.scaleLinear()
+                .domain([0, d3.max(data, d => d.value) || 100]) // Max based on data or 100
+                .nice() // Make the axis end on a nice round value
+                .range([height, 0]);
+
+            svg.append("g")
+                .call(d3.axisLeft(y).ticks(5).tickFormat(d => d + "%")) // Add % to ticks
+              .selectAll("text")
+                .attr("class", "axis-label");
+
+            // Bars with animation
+            svg.selectAll(".bar")
+                .data(data)
+                .enter()
+                .append("rect")
+                .attr("class", "bar")
+                .attr("x", d => x(d.name))
+                .attr("y", d => y(0)) 
+                .attr("width", x.bandwidth())
+                .attr("height", 0) 
+                .attr("rx", 4) // Rounded corners for bars
+                .attr("ry", 4)
+                .transition() 
+                .duration(800)
+                .delay((d,i) => i * 100) // Staggered animation
+                .attr("y", d => y(d.value))
+                .attr("height", d => height - y(d.value));
+
+            // Value labels on top of bars with animation
+            svg.selectAll(".bar-label")
+                .data(data)
+                .enter()
+                .append("text")
+                .attr("class", "bar-label")
+                .attr("x", d => x(d.name) + x.bandwidth() / 2)
+                .attr("y", d => y(d.value) - 8) // Position above the bar
+                .attr("text-anchor", "middle")
+                .style("font-size", "11px")
+                .style("font-weight", "600")
+                .style("fill", "#1f2937") // Gray-800
+                .style("opacity", 0) 
+                .text(d => d.value + "%")
+                .transition() 
+                .delay((d,i) => 800 + i * 100) // Delay to start after bars animate
+                .duration(500)
+                .style("opacity", 1);
+                
+            chartRendered = true;
+        }
+
+        // --- Initial Setup ---
+        window.onload = function() {
+            startTimer();
+            showSlide(currentSlide); // Show the first slide
+            // If the first slide is the D3 chart slide (index 13 for slide 14)
+            if (currentSlide === 13) { 
+                renderD3Chart();
+            }
+        };
+
+        window.addEventListener('resize', () => {
+            // D3 chart is on slide 14 (index 13)
+            if (currentSlide === 13 && slides[13].classList.contains('active')) {
+                renderD3Chart(); // Re-render on resize
+            }
+        });
+    </script>
+</body>
+</html>
